@@ -123,15 +123,15 @@ def load_cards_from_oracle_dataset(file: str) -> dict[str, CardData]:
     with open(file, "r") as f:
         data = json.load(f)
     
-    cards = []
+    cards = {}
     for oracle_card_data in data:
         card_data = CardData.from_oracle_dict(oracle_card_data)
         if card_data is not None:
-            cards.append(card_data)
+            cards[card_data.name] = card_data
 
     logger.info(f"Imported {len(cards)} of {len(data)} cards from {file}")
 
-    return {card.name: card for card in cards}
+    return cards
 
 
 def format_card(card: CardData, include_context_header = False) -> str:
