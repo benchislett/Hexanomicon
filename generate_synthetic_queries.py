@@ -86,7 +86,7 @@ async def main():
         raise ValueError("OPENROUTER_API_KEY environment variable is not set.")
     client = openai.AsyncClient(base_url="https://openrouter.ai/api/v1", api_key=api_key)
 
-    batch_size = 49
+    batch_size = 32
     for i in tqdm.tqdm(range(0, len(new_cards_to_query), batch_size)):
         batch_card_names = new_cards_to_query[i:i + batch_size]
         batch_prompts = new_cards_prompts[i:i + batch_size]
