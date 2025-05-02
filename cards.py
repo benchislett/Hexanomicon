@@ -1,7 +1,7 @@
 import json
 from functools import lru_cache
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Union
 from fire import Fire
 import numpy as np
 import textwrap
@@ -168,6 +168,7 @@ Oracle text: {card.oracle_text or "None"}"""
 @dataclass
 class CardDataset:
     """A dataset of cards, indexed by name."""
+    card_names: list[str]
     card_data: dict[str, CardData]
     formatted_cards: dict[str, str]
 
@@ -176,11 +177,26 @@ class CardDataset:
         """Load a dataset from a file."""
         card_data = load_cards_from_oracle_dataset(file)
         formatted_cards = {name: format_card(card) for name, card in card_data.items()}
-        return CardDataset(card_data, formatted_cards)
+        card_names = list(card_data.keys())
+        return CardDataset(card_names, card_data, formatted_cards)
 
     def __len__(self):
         """Return the number of cards in the dataset."""
-        return len(self.card_data)
+        return len(self.card_names)
+    
+    def __getitem__(self, idx: Union[int, str]) -> Union[str, CardData]:
+        """Get a card name by index or card data by name."""
+        if isinstance(idx, int):
+            return list(self.card_data.values())[idx]
+        elif isinstance(idx, str):
+            return self.card_data[idx]
+        else:
+            raise TypeError(f"Invalid index type: {type(idx)}")
+    
+    def __iter__(self):
+        """Iterate over the card names in the dataset."""
+        for card_name in self.card_names:
+            yield card_name
 
 
 def wrap_preserve(text: str, width: int = 80) -> str:
